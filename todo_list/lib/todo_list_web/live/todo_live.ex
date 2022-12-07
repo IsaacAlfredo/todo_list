@@ -3,13 +3,43 @@ defmodule TodoListWeb.TodoLive do
 
   alias TodoList.Todos
   def mount(_params, _session, socket) do
+    Todos.subscribe()
+
     {:ok, assign(socket, todos: Todos.list_todos())}
+  end
+
+  def handle_info({Todos, [:todo | _], _}, socket) do
+  {:noreply, fetch(socket)}
   end
 
   def handle_event("add", %{"todo" => todo}, socket) do
   Todos.create_todo(todo)
 
-  {:noreply, fetch(socket)}
+  {:noreply, socket}
+  end
+
+  def handle_event("delete", %{"id" => id}, socket) do
+    todo = Todos.get_todo!(id)
+
+    case Todos.delete_todo(todo) do
+      {:ok, deleted_todo} ->
+        socket =
+          update(socket, :todos, fn todos ->
+            Enum.reject(todos, &(&1.id == deleted_todo.id))
+          end)
+
+        {:noreply, put_flash(socket, :info, "Todo '#{deleted_todo.id}' deleted")}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, "An error occured while deleting a todo")}
+    end
+  end
+
+
+  def handle_event("toggle_done", %{"id" => id}, socket) do
+  todo = Todos.get_todo!(id)
+  Todos.update_todo(todo, %{done: !todo.done})
+  {:noreply, socket}
   end
 
   defp fetch(socket) do
