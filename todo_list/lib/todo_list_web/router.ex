@@ -17,7 +17,7 @@ defmodule TodoListWeb.Router do
   scope "/", TodoListWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    live "/", TodoLive, :index
   end
 
   # Other scopes may use custom stacks.
