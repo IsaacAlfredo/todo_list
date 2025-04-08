@@ -1,7 +1,4 @@
-type Todo = {
-  title: string;
-  description?: string;
-};
+import { Todo } from "./Todo";
 
 function TodoCard(todo: Todo) {
   return (
