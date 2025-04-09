@@ -1,6 +1,7 @@
-import { Todo } from "./Todo";
+import { DefaultButton } from "../DefaultButton/DefaultButton";
+import { TodoType } from "./TodoType";
 
-function TodoCard(todo: Todo) {
+function TodoCard(todo: TodoType) {
   return (
     <div className="w-2/3 p-1">
       <div className="flex w-full gap-2">
@@ -16,16 +17,8 @@ function TodoCard(todo: Todo) {
         {todo.description}
       </p>
       <div className="flex justify-end gap-2">
-        <button className="focus:ring-3 group mb-2 flex rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 font-medium focus:ring-blue-300 dark:focus:ring-blue-900">
-          <span className="w-full rounded-md bg-blue-50 px-5 py-2.5 text-sm transition-all duration-200 ease-in group-hover:bg-transparent group-hover:text-blue-50 dark:bg-gray-900 dark:text-blue-50 group-hover:dark:bg-transparent">
-            Editar
-          </span>
-        </button>
-        <button className="focus:ring-3 group mb-2 flex rounded-lg bg-gradient-to-br from-red-400 to-red-700 p-0.5 font-medium focus:ring-blue-300 dark:focus:ring-blue-900">
-          <span className="w-full rounded-md bg-blue-50 px-5 py-2.5 text-sm transition-all duration-200 ease-in group-hover:bg-transparent group-hover:text-blue-50 dark:bg-gray-900 dark:text-blue-50 group-hover:dark:bg-transparent">
-            Excluir
-          </span>
-        </button>
+        <DefaultButton text="Editar" color="blue" />
+        <DefaultButton text="Excluir" color="red" />
       </div>
     </div>
   );
