@@ -1,7 +1,7 @@
 import { DefaultButton } from "../DefaultButton/DefaultButton";
-import { TodoType } from "./TodoType";
+import { TodoProps } from "./TodoProps";
 
-export function TodoCard(todo: TodoType) {
+export function TodoCard(todo: TodoProps) {
   return (
     <div className="w-2/3 p-1">
       <div className="flex w-full gap-2">

@@ -1,4 +1,5 @@
-export type TodoType = {
+export interface TodoProps {
   title: string;
   description?: string;
+  id: number;
 };
