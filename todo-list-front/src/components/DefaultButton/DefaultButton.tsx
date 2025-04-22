@@ -1,6 +1,6 @@
-import { DefaultButtonType } from "./DefaultButtonType";
+import { DefaultButtonProps } from "./DefaultButtonProps";
 
-export function DefaultButton(defaultButton: DefaultButtonType) {
+export function DefaultButton(defaultButton: DefaultButtonProps) {
   return (
     <button
       onClick={defaultButton.onClick}

@@ -33,6 +33,7 @@ function App() {
             description={TodoCards.description}
             key={TodoCards.id}
             id={TodoCards.id}
+            setTodoCardList={setTodoCardList}
           />
         ))}
       </ul>

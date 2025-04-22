@@ -1,7 +1,22 @@
 import { DefaultButton } from "../DefaultButton/DefaultButton";
 import { TodoProps } from "./TodoProps";
+import axios from "axios";
 
 export function TodoCard(todo: TodoProps) {
+  async function handleDelete() {
+    try {
+      const del = axios.delete(`http://127.0.0.1:5000/${todo.id}`);
+      const deleteStatus = (await del).status;
+      if (deleteStatus == 204) {
+        todo.setTodoCardList((prevTodos) =>
+          prevTodos.filter((todos) => todos.id !== todo.id),
+        );
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   return (
     <div className="w-2/3 p-1">
       <div className="flex w-full gap-2">
@@ -18,7 +33,7 @@ export function TodoCard(todo: TodoProps) {
       </p>
       <div className="flex justify-end gap-2">
         <DefaultButton text="Editar" color="blue" />
-        <DefaultButton text="Excluir" color="red" />
+        <DefaultButton text="Excluir" color="red" onClick={handleDelete} />
       </div>
     </div>
   );
