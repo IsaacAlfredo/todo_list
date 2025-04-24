@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { DefaultButton } from "../DefaultButton/DefaultButton";
 import { TodoProps } from "./TodoProps";
 import axios from "axios";
 
 export function TodoCard(todo: TodoProps) {
+  const [isChecked, setIsChecked] = useState(todo.check);
+
   async function handleDelete() {
     try {
       const del = axios.delete(`http://127.0.0.1:5000/${todo.id}`);
@@ -11,6 +14,22 @@ export function TodoCard(todo: TodoProps) {
         todo.setTodoCardList((prevTodos) =>
           prevTodos.filter((todos) => todos.id !== todo.id),
         );
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function handleCheck() {
+    try {
+      if (isChecked) {
+        await axios.patch(`http://127.0.0.1:5000/${todo.id}`, { check: false });
+        setIsChecked(false);
+      } else {
+        await axios.patch(`http://127.0.0.1:5000/${todo.id}`, {
+          check: true,
+        });
+        setIsChecked(true);
       }
     } catch (err) {
       console.log(err);
@@ -26,6 +45,8 @@ export function TodoCard(todo: TodoProps) {
         <input
           type="checkbox"
           className="mr-1 flex size-9 self-center justify-self-end rounded-full border-zinc-500 bg-blue-950/40"
+          checked={isChecked}
+          onChange={handleCheck}
         />
       </div>
       <p className="wrap-break-word mb-5 text-balance font-thin dark:text-blue-50">

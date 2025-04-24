@@ -34,6 +34,7 @@ function App() {
             description={TodoCards.description}
             key={TodoCards.id}
             id={TodoCards.id}
+            check={TodoCards.check}
             setTodoCardList={setTodoCardList}
           />
         ))}
