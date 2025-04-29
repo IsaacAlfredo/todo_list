@@ -7,7 +7,7 @@ import axios from "axios";
 
 export function TodoInputBox({ fetchData }: TodoInputBoxProps) {
   const todoSubmitSchema = z.object({
-    title: z.string().min(5),
+    title: z.string().min(2),
     description: z.string(),
   });
   type TodoSubmitSchema = z.infer<typeof todoSubmitSchema>;
