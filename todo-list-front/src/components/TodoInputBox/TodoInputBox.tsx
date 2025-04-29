@@ -4,8 +4,11 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TodoInputBoxProps } from "./TodoInputBoxProps";
 import axios from "axios";
+import { useState } from "react";
 
 export function TodoInputBox({ fetchData }: TodoInputBoxProps) {
+  const [titleExists, setTitleExists] = useState(false);
+
   const todoSubmitSchema = z.object({
     title: z.string().min(2),
     description: z.string(),
@@ -17,16 +20,21 @@ export function TodoInputBox({ fetchData }: TodoInputBoxProps) {
   });
 
   async function handleTodoSubmit(data: TodoSubmitSchema) {
-    console.log(data);
-    try {
-      await axios.post("http://127.0.0.1:5000/", {
+    await axios
+      .post("http://127.0.0.1:5000/", {
         title: data.title,
         description: data.description,
+      })
+      .then(() => {
+        fetchData();
+        setTitleExists(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err.status == 409) {
+          setTitleExists(true);
+        }
       });
-      fetchData();
-    } catch (err) {
-      console.log(err);
-    }
   }
 
   return (
@@ -35,6 +43,9 @@ export function TodoInputBox({ fetchData }: TodoInputBoxProps) {
       className="bg-purple-900-900/30 rounded-b-xs mb-2 w-2/3 flex-col justify-items-end gap-2 justify-self-center border-b-2 border-indigo-500 p-2"
     >
       <div className="w-full">
+        {titleExists ? (
+          <span className="text-red-700">Titulo já existente</span>
+        ) : null}
         <div className="focus:ring-3 group mb-2 w-full flex-col rounded-xl bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 font-medium focus:ring-blue-300 dark:focus:ring-blue-900">
           <label className="ml-1 font-normal text-blue-50">
             Titulo

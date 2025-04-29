@@ -39,8 +39,8 @@ export function TodoEditBox({
         setTodoData({ title: data.title, description: data.description });
         setIsEditing(false);
       })
-      .catch((error) => {
-        if (error.status == 409) {
+      .catch((err) => {
+        if (err.status == 409) {
           setTitleExists(true);
         }
       });
