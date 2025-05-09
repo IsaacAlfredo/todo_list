@@ -3,5 +3,5 @@ export interface TodoEditBoxProps {
     setTodoData: React.Dispatch<React.SetStateAction<{ title: string; description: string | undefined; }>>;
     title: string
     description?: string
-    id:number
+    id: number
 };

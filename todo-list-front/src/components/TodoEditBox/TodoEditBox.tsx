@@ -13,15 +13,22 @@ export function TodoEditBox({
   description,
   id,
 }: TodoEditBoxProps) {
-  const [titleExists, setTitleExists] = useState(false);
+  const [errorMessage, setErrorMessage] = useState({
+    status: false,
+    message: "",
+  });
 
   const todoEditSchema = z.object({
-    title: z.string().min(2),
+    title: z.string().min(2, { message: "Titulo muito curto" }),
     description: z.string(),
   });
   type TodoSubmitSchema = z.infer<typeof todoEditSchema>;
 
-  const { register, handleSubmit } = useForm<TodoSubmitSchema>({
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+  } = useForm<TodoSubmitSchema>({
     resolver: zodResolver(todoEditSchema),
   });
 
@@ -29,7 +36,16 @@ export function TodoEditBox({
     setIsEditing(false);
   }
 
+  function handleOnChange() {
+    if (errorMessage.status) {
+      setErrorMessage({ status: false, message: "" });
+    }
+  }
+
   async function handleSave(data: TodoSubmitSchema) {
+    const validation = todoEditSchema.safeParse(data);
+    console.log(validation);
+
     await axios
       .patch(`http://127.0.0.1:5000/${id}`, {
         title: data.title,
@@ -40,8 +56,9 @@ export function TodoEditBox({
         setIsEditing(false);
       })
       .catch((err) => {
+        console.log(err);
         if (err.status == 409) {
-          setTitleExists(true);
+          setErrorMessage({ status: true, message: "Titulo já existente" });
         }
       });
   }
@@ -59,10 +76,11 @@ export function TodoEditBox({
               defaultValue={title}
             />
           </label>
-
-          {titleExists ? (
-            <span className="text-red-700">Titulo já existente</span>
-          ) : null}
+          {errorMessage.status ? (
+            <span className="text-red-700">{errorMessage.message}</span>
+          ) : (
+            <span className="text-red-700">{errors.title?.message}</span>
+          )}
         </div>
 
         <label className="ml-1 font-normal dark:text-blue-50">
@@ -74,7 +92,7 @@ export function TodoEditBox({
           ></textarea>
         </label>
         <div className="mt-2 flex justify-end gap-2">
-          <DefaultButton text="Salvar" color="blue" />
+          <DefaultButton text="Salvar" color="blue" onClick={handleOnChange} />
           <DefaultButton
             text="Cancelar"
             color="red"
