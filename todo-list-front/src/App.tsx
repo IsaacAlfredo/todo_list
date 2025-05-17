@@ -3,13 +3,14 @@ import { TodoCard } from "./components/TodoCard/TodoCard";
 import { TodoInputBox } from "./components/TodoInputBox/TodoInputBox";
 import axios from "axios";
 import { TodoProps } from "./components/TodoCard/TodoProps";
+import { API_URL } from "./config";
 
 function App() {
   const [todoCardList, setTodoCardList] = useState<Array<TodoProps>>([]);
 
   async function fetchData() {
     try {
-      const todoAPI = await axios.get("http://127.0.0.1:5000/");
+      const todoAPI = await axios.get(API_URL);
       setTodoCardList(todoAPI.data);
     } catch (err) {
       console.log(err);

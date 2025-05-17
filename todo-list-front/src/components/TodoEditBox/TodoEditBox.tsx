@@ -1,10 +1,17 @@
 import axios from "axios";
+import { API_URL } from "../../config";
+
+import { useState } from "react";
 import { DefaultButton } from "../DefaultButton/DefaultButton";
 import { TodoEditBoxProps } from "./TodoEditBoxProps";
+import { ErrorCard } from "../ErrorCard/ErrorCard";
+
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import {
+  todoSubmitSchema,
+  TodoSubmitSchemaType,
+} from "../../schemas/TodoSubmitSchema";
 
 export function TodoEditBox({
   setIsEditing,
@@ -18,36 +25,31 @@ export function TodoEditBox({
     message: "",
   });
 
-  const todoEditSchema = z.object({
-    title: z.string().min(2, { message: "Titulo muito curto" }),
-    description: z.string(),
-  });
-  type TodoSubmitSchema = z.infer<typeof todoEditSchema>;
-
   const {
     register,
     formState: { errors },
     handleSubmit,
-  } = useForm<TodoSubmitSchema>({
-    resolver: zodResolver(todoEditSchema),
+  } = useForm<TodoSubmitSchemaType>({
+    resolver: zodResolver(todoSubmitSchema),
   });
 
   function handleCancel() {
     setIsEditing(false);
   }
 
-  function handleOnChange() {
+  function handleErrorMessage() {
     if (errorMessage.status) {
       setErrorMessage({ status: false, message: "" });
     }
   }
 
-  async function handleSave(data: TodoSubmitSchema) {
-    const validation = todoEditSchema.safeParse(data);
-    console.log(validation);
+  async function handleSave(data: TodoSubmitSchemaType) {
+    if (errorMessage.status) {
+      setErrorMessage({ status: false, message: "" });
+    }
 
     await axios
-      .patch(`http://127.0.0.1:5000/${id}`, {
+      .patch(`${API_URL}/${id}`, {
         title: data.title,
         description: data.description,
       })
@@ -58,7 +60,7 @@ export function TodoEditBox({
       .catch((err) => {
         console.log(err);
         if (err.status == 409) {
-          setErrorMessage({ status: true, message: "Titulo já existente" });
+          setErrorMessage({ status: true, message: "Título já existente" });
         }
       });
   }
@@ -77,9 +79,9 @@ export function TodoEditBox({
             />
           </label>
           {errorMessage.status ? (
-            <span className="text-red-700">{errorMessage.message}</span>
+            <ErrorCard message={errorMessage.message} />
           ) : (
-            <span className="text-red-700">{errors.title?.message}</span>
+            <ErrorCard message={errors.title?.message} />
           )}
         </div>
 
@@ -92,7 +94,11 @@ export function TodoEditBox({
           ></textarea>
         </label>
         <div className="mt-2 flex justify-end gap-2">
-          <DefaultButton text="Salvar" color="blue" onClick={handleOnChange} />
+          <DefaultButton
+            text="Salvar"
+            color="blue"
+            onClick={handleErrorMessage}
+          />
           <DefaultButton
             text="Cancelar"
             color="red"

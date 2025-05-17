@@ -1,41 +1,61 @@
 import { DefaultButton } from "../DefaultButton/DefaultButton";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TodoInputBoxProps } from "./TodoInputBoxProps";
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { ErrorCard } from "../ErrorCard/ErrorCard";
+import {
+  TodoSubmitSchemaType,
+  todoSubmitSchema,
+} from "../../schemas/TodoSubmitSchema";
+import { API_URL } from "../../config";
 
 export function TodoInputBox({ fetchData }: TodoInputBoxProps) {
-  const [titleExists, setTitleExists] = useState(false);
-
-  const todoSubmitSchema = z.object({
-    title: z.string().min(2),
-    description: z.string(),
+  const [errorMessage, setErrorMessage] = useState({
+    status: false,
+    message: "",
   });
-  type TodoSubmitSchema = z.infer<typeof todoSubmitSchema>;
 
-  const { register, handleSubmit } = useForm<TodoSubmitSchema>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitSuccessful },
+    formState,
+    reset,
+  } = useForm<TodoSubmitSchemaType>({
     resolver: zodResolver(todoSubmitSchema),
   });
 
-  async function handleTodoSubmit(data: TodoSubmitSchema) {
+  function handleErrorMessage() {
+    if (errorMessage.status) {
+      setErrorMessage({ status: false, message: "" });
+    }
+  }
+
+  async function handleTodoSubmit(data: TodoSubmitSchemaType) {
     await axios
-      .post("http://127.0.0.1:5000/", {
+      .post(API_URL, {
         title: data.title,
         description: data.description,
       })
       .then(() => {
         fetchData();
-        setTitleExists(false);
+        setErrorMessage({ status: false, message: "" });
       })
       .catch((err) => {
         console.log(err);
         if (err.status == 409) {
-          setTitleExists(true);
+          setErrorMessage({ status: true, message: "Título já existente" });
         }
       });
   }
+
+  useEffect(() => {
+    if (isSubmitSuccessful) {
+      reset();
+    }
+  }, [reset, formState, isSubmitSuccessful]);
 
   return (
     <form
@@ -43,9 +63,11 @@ export function TodoInputBox({ fetchData }: TodoInputBoxProps) {
       className="bg-purple-900-900/30 rounded-b-xs mb-2 w-2/3 flex-col justify-items-end gap-2 justify-self-center border-b-2 border-indigo-500 p-2"
     >
       <div className="w-full">
-        {titleExists ? (
-          <span className="text-red-700">Titulo já existente</span>
-        ) : null}
+        {errorMessage.status ? (
+          <ErrorCard message={errorMessage.message} />
+        ) : (
+          <ErrorCard message={errors.title?.message} />
+        )}
         <div className="focus:ring-3 group mb-2 w-full flex-col rounded-xl bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 font-medium focus:ring-blue-300 dark:focus:ring-blue-900">
           <label className="ml-1 font-normal text-blue-50">
             Titulo
@@ -64,7 +86,11 @@ export function TodoInputBox({ fetchData }: TodoInputBoxProps) {
           </label>
         </div>
       </div>
-      <DefaultButton text="Criar To Do" color="blue" />
+      <DefaultButton
+        text="Criar To Do"
+        color="blue"
+        onClick={handleErrorMessage}
+      />
     </form>
   );
 }

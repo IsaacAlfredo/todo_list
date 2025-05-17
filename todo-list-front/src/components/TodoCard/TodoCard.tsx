@@ -3,6 +3,7 @@ import { DefaultButton } from "../DefaultButton/DefaultButton";
 import { TodoProps } from "./TodoProps";
 import axios from "axios";
 import { TodoEditBox } from "../TodoEditBox/TodoEditBox";
+import { API_URL } from "../../config";
 
 export function TodoCard(todo: TodoProps) {
   const [isChecked, setIsChecked] = useState(todo.check);
@@ -14,7 +15,7 @@ export function TodoCard(todo: TodoProps) {
 
   async function handleDelete() {
     try {
-      const del = axios.delete(`http://127.0.0.1:5000/${todo.id}`);
+      const del = axios.delete(`${API_URL}/${todo.id}`);
       const deleteStatus = (await del).status;
       if (deleteStatus == 204) {
         todo.setTodoCardList((prevTodos) =>
@@ -29,10 +30,10 @@ export function TodoCard(todo: TodoProps) {
   async function handleCheck() {
     try {
       if (isChecked) {
-        await axios.patch(`http://127.0.0.1:5000/${todo.id}`, { check: false });
+        await axios.patch(`${API_URL}/${todo.id}`, { check: false });
         setIsChecked(false);
       } else {
-        await axios.patch(`http://127.0.0.1:5000/${todo.id}`, {
+        await axios.patch(`${API_URL}/${todo.id}`, {
           check: true,
         });
         setIsChecked(true);
